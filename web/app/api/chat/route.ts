@@ -11,6 +11,11 @@ import { searchPages } from "@/lib/search";
 
 export const maxDuration = 60;
 
+// Retrieve a broader set to synthesize a complete answer from, but only surface
+// the strongest few to the user as image thumbnails.
+const CONTEXT_PAGES = 6; // pages GPT-4o reads to compose the answer
+const DISPLAY_PAGES = 3; // top pages shown to the user as thumbnails
+
 /** Pull the plain text out of the latest user UIMessage. */
 function lastUserText(messages: UIMessage[]): string {
   const last = [...messages].reverse().find((m) => m.role === "user");
@@ -57,7 +62,7 @@ export async function POST(req: Request) {
       }
 
       // ── 2. Retrieve relevant pages (visual late-interaction search) ───────
-      const hits = await searchPages(route.query || question, 4);
+      const hits = await searchPages(route.query || question, CONTEXT_PAGES);
 
       if (hits.length === 0) {
         const r = streamText({
@@ -70,11 +75,11 @@ export async function POST(req: Request) {
         return;
       }
 
-      // ── 3. Emit the source pages so the UI can show them ──────────────────
+      // ── 3. Surface the strongest pages to the UI as thumbnails ────────────
       writer.write({
         type: "data-sources",
         id: "sources",
-        data: hits.map((h) => ({
+        data: hits.slice(0, DISPLAY_PAGES).map((h) => ({
           book: h.book,
           page: h.page,
           image_url: h.image_url,
@@ -82,15 +87,16 @@ export async function POST(req: Request) {
         })),
       });
 
-      // ── 4. Ground the answer on the page images (GPT-4o vision) ───────────
+      // ── 4. Ground the answer on the full retrieved set (GPT-4o vision) ────
       const sources = hits.map((h) => `${h.book} · p.${h.page}`).join("; ");
       const r = streamText({
         model: openai("gpt-4o"),
         system:
-          "You answer using ONLY the textbook page images provided. Base every " +
-          "claim on what is visible in those pages, including figures and " +
-          "diagrams. Cite sources inline as (book · page). If the pages don't " +
-          "contain the answer, say so honestly — do not invent.",
+          "You answer using ONLY the textbook page images provided. Read ALL of " +
+          "them and synthesize a complete answer, basing every claim on what is " +
+          "visible in those pages, including figures and diagrams. Cite sources " +
+          "inline as (book · page). If the pages don't contain the answer, say so " +
+          "honestly — do not invent.",
         messages: [
           {
             role: "user",
