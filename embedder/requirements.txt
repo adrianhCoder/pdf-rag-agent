@@ -1,0 +1,3 @@
+# Only needed locally to deploy the Modal app. The heavy deps (torch,
+# colpali-engine, transformers) are installed inside the Modal image.
+modal>=0.64

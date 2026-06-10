@@ -1,0 +1,56 @@
+* { box-sizing: border-box; }
+
+:root {
+  --bg: #0b0b0d;
+  --panel: #16161a;
+  --border: #2a2a31;
+  --text: #ececf1;
+  --muted: #9a9aa6;
+  --accent: #4f8cff;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+.shell { max-width: 820px; margin: 0 auto; padding: 24px 16px 120px; }
+
+header h1 { font-size: 20px; margin: 0 0 2px; }
+header p { color: var(--muted); margin: 0 0 20px; font-size: 13px; }
+
+.msg { display: flex; gap: 10px; margin: 14px 0; }
+.msg .role {
+  flex: 0 0 28px; height: 28px; border-radius: 6px; font-size: 12px;
+  display: grid; place-items: center; background: var(--panel); border: 1px solid var(--border);
+}
+.msg.user .role { color: var(--accent); }
+.bubble { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 10px 14px; white-space: pre-wrap; line-height: 1.5; }
+.bubble.user { background: transparent; border-color: transparent; padding-top: 4px; }
+
+form {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(transparent, var(--bg) 30%);
+  padding: 16px;
+}
+.composer { max-width: 820px; margin: 0 auto; display: flex; gap: 8px; }
+input[type="text"] {
+  flex: 1; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--text); font-size: 15px;
+}
+button {
+  padding: 12px 18px; border-radius: 10px; border: none;
+  background: var(--accent); color: white; font-weight: 600; cursor: pointer;
+}
+button:disabled { opacity: 0.5; cursor: default; }
+.hint { color: var(--muted); font-size: 12px; margin-top: 8px; text-align: center; }
+
+.sources { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; }
+.sources-label { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 8px; }
+.thumbs { display: flex; gap: 10px; flex-wrap: wrap; }
+.thumb { display: flex; flex-direction: column; gap: 4px; width: 110px; text-decoration: none; color: var(--muted); font-size: 11px; }
+.thumb img { width: 110px; height: 142px; object-fit: cover; border-radius: 6px; border: 1px solid var(--border); background: #fff; }
+.thumb:hover img { border-color: var(--accent); }
