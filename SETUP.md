@@ -6,7 +6,7 @@ Order matters: the web app depends on the embedder and a populated Qdrant.
 - [Qdrant Cloud](https://cloud.qdrant.io) — create a free cluster → copy **URL** + **API key**
 - [Modal](https://modal.com) — sign up, `pip install modal && modal setup`
 - [Vercel](https://vercel.com) — for Blob storage + hosting
-- [OpenAI](https://platform.openai.com) — API key (GPT-4o)
+- [Google AI Studio](https://aistudio.google.com/apikey) — free Gemini API key (no card)
 
 ## 1. Deploy the ColPali embedder (Modal)
 ```bash
@@ -44,5 +44,5 @@ npm run dev                        # http://localhost:3000
 Deploy: push to GitHub → import in Vercel → add the env vars from `.env.local`.
 
 ## Cost note
-Modal scales to zero (you pay only while embedding). Qdrant/Blob free tiers and a
-small OpenAI spend are enough for a demo.
+Modal scales to zero (you pay only while embedding). Qdrant/Blob/Gemini free tiers
+are enough for a demo — only Modal touches your $30 credit, and barely.

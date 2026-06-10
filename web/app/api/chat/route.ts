@@ -1,4 +1,4 @@
-import { openai } from "@ai-sdk/openai";
+import { google } from "@ai-sdk/google";
 import {
   createUIMessageStream,
   createUIMessageStreamResponse,
@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     execute: async ({ writer }) => {
       // ── 1. Router (the agent decides what to do) ──────────────────────────
       const { object: route } = await generateObject({
-        model: openai("gpt-4o-mini"),
+        model: google("gemini-2.5-flash"),
         schema: z.object({
           action: z.enum(["search", "refuse", "chitchat"]),
           query: z.string().describe("a clean retrieval query when action=search"),
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
       if (route.action !== "search") {
         const r = streamText({
-          model: openai("gpt-4o-mini"),
+          model: google("gemini-2.5-flash"),
           system: "Reply briefly and naturally.",
           prompt: route.reply || "Hello!",
         });
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
       if (hits.length === 0) {
         const r = streamText({
-          model: openai("gpt-4o-mini"),
+          model: google("gemini-2.5-flash"),
           prompt:
             "Say, honestly and briefly, that the corpus doesn't contain " +
             "information to answer this question.",
@@ -90,7 +90,7 @@ export async function POST(req: Request) {
       // ── 4. Ground the answer on the full retrieved set (GPT-4o vision) ────
       const sources = hits.map((h) => `${h.book} · p.${h.page}`).join("; ");
       const r = streamText({
-        model: openai("gpt-4o"),
+        model: google("gemini-2.5-flash"),
         system:
           "You answer using ONLY the textbook page images provided. Read ALL of " +
           "them and synthesize a complete answer, basing every claim on what is " +

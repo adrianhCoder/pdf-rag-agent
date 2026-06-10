@@ -47,8 +47,8 @@ INGESTION (run once)                                   web/ingestion
 
 RUNTIME (Vercel · Next.js)                             web/
   question ─▶ /api/chat
-     router (gpt-4o-mini) ─▶ tool: ColPali(query) ─▶ Qdrant MaxSim search (top-k)
-        ─▶ retrieved page images ─▶ GPT-4o (vision) ─▶ streamed answer + citations
+     router (Gemini Flash) ─▶ tool: ColPali(query) ─▶ Qdrant MaxSim search (top-k)
+        ─▶ retrieved page images ─▶ Gemini 2.5 Flash (vision) ─▶ streamed answer + citations
         ─▶ source pages streamed to the UI as thumbnails
 
 EMBEDDER (Modal · Python · GPU, scale-to-zero)        embedder/
@@ -61,9 +61,9 @@ EMBEDDER (Modal · Python · GPU, scale-to-zero)        embedder/
 | Retrieval over figures | **ColPali / ColQwen2** | Embeds page *images* directly (late interaction), so charts and diagrams are first-class — no brittle OCR pipeline |
 | Vector DB | **Qdrant** | One of the few with native **multivector + MaxSim**, which ColPali requires; generous free tier |
 | Hosting the model | **Modal** (GPU, scale-to-zero) | ColPali is Python/GPU-only; Modal keeps it in one place and costs ~nothing when idle |
-| App + agent | **Next.js + Vercel AI SDK** | Native Vercel deploy, streaming, GPT-4o tool/▶ loop; gives a clean TypeScript surface |
+| App + agent | **Next.js + Vercel AI SDK** | Native Vercel deploy, streaming, Gemini 2.5 Flash tool/▶ loop; gives a clean TypeScript surface |
 | Image storage | **Vercel Blob** | Serves retrieved pages to both the vision model and the UI |
-| Answering model | **GPT-4o (vision)** | Reads the retrieved page images to answer figure/diagram questions |
+| Answering model | **Gemini 2.5 Flash (vision)** | Reads the retrieved page images to answer figure/diagram questions |
 | Corpus | **OpenStax (CC-licensed)** | Figure-dense textbooks; fully shareable, no IP concerns |
 
 ### Engineering details worth noting
