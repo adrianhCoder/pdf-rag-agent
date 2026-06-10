@@ -31,11 +31,14 @@ def iter_pdf_paths(arg: str):
 
 
 def render_pages(pdf_path: Path):
-    """Yield (page_number, png_bytes) for each page."""
+    """Yield (page_number, png_bytes) for each page, up to MAX_PAGES_PER_PDF."""
     doc = fitz.open(pdf_path)
     zoom = config.RENDER_DPI / 72.0
     matrix = fitz.Matrix(zoom, zoom)
+    cap = config.MAX_PAGES_PER_PDF
     for i, page in enumerate(doc):
+        if cap and i >= cap:
+            break
         pix = page.get_pixmap(matrix=matrix)
         yield i + 1, pix.tobytes("png")
     doc.close()

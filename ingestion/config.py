@@ -18,6 +18,11 @@ VECTOR_DIM = 128
 RENDER_DPI = 150
 EMBED_BATCH = 2  # pages per Modal call (multivectors are large; keep small)
 
+# Cap pages per PDF so you can drop full OpenStax books without trimming them by
+# hand. Protects the Qdrant free tier (1 GiB RAM) and Modal GPU cost. 0 = no cap.
+# Override per run with the MAX_PAGES_PER_PDF env var.
+MAX_PAGES_PER_PDF = int(os.environ.get("MAX_PAGES_PER_PDF", "100"))
+
 
 def qdrant_client():
     from qdrant_client import QdrantClient
