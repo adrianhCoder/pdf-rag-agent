@@ -1,4 +1,4 @@
-/** Late-interaction (MaxSim) search over page multivectors in Qdrant. */
+/** Text-embedding (cosine) search over page vectors in Qdrant. */
 import { embedQuery } from "./embed";
 
 const QDRANT_URL = process.env.QDRANT_URL!;
@@ -13,7 +13,7 @@ export type PageHit = {
 };
 
 export async function searchPages(query: string, limit = 4): Promise<PageHit[]> {
-  const vector = await embedQuery(query); // number[][] multivector
+  const vector = await embedQuery(query); // number[] single vector
 
   const res = await fetch(
     `${QDRANT_URL}/collections/${COLLECTION}/points/query`,
