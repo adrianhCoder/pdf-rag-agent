@@ -75,7 +75,8 @@ export default function Home() {
             {m.parts.map((p, i) => {
               if (p.type === "text") return <span key={i}>{p.text}</span>;
               if (p.type === "data-sources") {
-                const sources = (p as { data: Source[] }).data;
+                const sources = (p as { data?: Source[] }).data ?? [];
+                if (sources.length === 0) return null;
                 return (
                   <div className="sources" key={i}>
                     <div className="sources-label">Source pages</div>
