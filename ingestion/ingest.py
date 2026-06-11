@@ -87,7 +87,9 @@ def upload_image(book: str, page: int, png: bytes) -> str:
     """
     safe_book = book.replace(" ", "_")
     path = f"pages/{safe_book}/p{page:04d}.png"
-    res = vercel_blob.put(path, png, {"addRandomSuffix": "false"})
+    res = vercel_blob.put(
+        path, png, {"addRandomSuffix": "false", "allowOverwrite": "true"}
+    )
     return res["url"]
 
 
