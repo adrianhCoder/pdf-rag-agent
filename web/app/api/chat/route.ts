@@ -76,10 +76,11 @@ export async function POST(req: Request) {
       }
 
       // ── 3. Surface the strongest pages to the UI as thumbnails ────────────
+      const shown = hits.slice(0, DISPLAY_PAGES);
       writer.write({
         type: "data-sources",
         id: "sources",
-        data: hits.slice(0, DISPLAY_PAGES).map((h) => ({
+        data: shown.map((h) => ({
           book: h.book,
           page: h.page,
           image_url: h.image_url,
@@ -87,23 +88,24 @@ export async function POST(req: Request) {
         })),
       });
 
-      // ── 4. Ground the answer on the full retrieved set (GPT-4o vision) ────
-      const sources = hits.map((h) => `${h.book} · p.${h.page}`).join("; ");
+      // ── 4. Ground the answer on those pages (Gemini vision) ───────────────
+      const sources = shown.map((h) => `${h.book} · p.${h.page}`).join("; ");
       const r = streamText({
         model: google("gemini-2.5-flash"),
         system:
-          "You answer using ONLY the textbook page images provided. Read ALL of " +
-          "them and synthesize a complete answer, basing every claim on what is " +
-          "visible in those pages, including figures and diagrams. Cite sources " +
-          "inline as (book · page). If the pages don't contain the answer, say so " +
-          "honestly — do not invent.",
+          "You answer using ONLY the textbook page images provided. Structure your " +
+          "reply as: (1) a direct 1-2 sentence answer to the question; then (2) a " +
+          "short bullet for EACH page summarizing what it shows (text, figures, " +
+          "diagrams), each ending with its citation as (book · page). Base every " +
+          "claim only on what is visible in the pages — if they don't contain the " +
+          "answer, say so honestly; never invent.",
         messages: [
           {
             role: "user",
             content: [
-              { type: "text", text: question },
-              ...hits.map((h) => ({ type: "image" as const, image: new URL(h.image_url) })),
-              { type: "text", text: `Available sources to cite: ${sources}` },
+              { type: "text", text: `Question: ${question}` },
+              ...shown.map((h) => ({ type: "image" as const, image: new URL(h.image_url) })),
+              { type: "text", text: `The pages above are, in order: ${sources}` },
             ],
           },
         ],
