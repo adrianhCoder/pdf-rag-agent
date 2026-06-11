@@ -6,6 +6,13 @@ import RobotFace, { type RobotState } from "@/components/RobotFace";
 
 type Source = { book: string; page: number; image_url: string; score: number };
 
+const STARTERS = [
+  "Where are combat aircraft? Show me the pages.",
+  "How do you identify or recognize an aircraft?",
+  "How does a turbofan engine work?",
+  "What are the main parts of a reciprocating engine?",
+];
+
 export default function Home() {
   const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState("");
@@ -33,12 +40,36 @@ export default function Home() {
       <header className="chat-header">
         <h1>Visual RAG Agent</h1>
         <p>
-          Ask about the indexed illustrated documents — figures and diagrams included.
-          Answers are grounded on the source pages shown beneath each reply.
+          An agentic <b>visual RAG</b>: it reads the actual document pages (figures and
+          diagrams included) and answers with the source pages cited.
         </p>
       </header>
 
       <div className="messages-area">
+        {messages.length === 0 && (
+          <div className="welcome">
+            <p className="welcome-corpus">
+              📚 Indexed corpus: <b>US Army — Visual Aircraft Recognition</b> and the{" "}
+              <b>FAA Aviation Maintenance — Powerplant Handbook</b>. Ask about aircraft
+              identification/recognition or aircraft engines — the agent finds the
+              relevant pages and answers from what they actually show.
+            </p>
+            <div className="starters-label">Try asking</div>
+            <div className="starters">
+              {STARTERS.map((s, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  className="starter-btn"
+                  onClick={() => !busy && sendMessage({ text: s })}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         {messages.map((m) => (
           <div key={m.id} className={`message ${m.role}`}>
             {m.parts.map((p, i) => {
