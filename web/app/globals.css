@@ -166,6 +166,12 @@ html, body {
 }
 .thumb:hover img { transform: translateY(-3px); }
 
+.message.error-msg {
+  background: rgba(254, 226, 226, 0.85);
+  color: #991b1b;
+  border-color: rgba(248, 113, 113, 0.4);
+}
+
 /* Thinking dots */
 .thinking-dots {
   align-self: flex-start; display: flex; align-items: center; gap: 5px;

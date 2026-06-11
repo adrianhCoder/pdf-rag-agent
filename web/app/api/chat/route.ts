@@ -35,7 +35,7 @@ export async function POST(req: Request) {
     execute: async ({ writer }) => {
       // ── 1. Router (the agent decides what to do) ──────────────────────────
       const { object: route } = await generateObject({
-        model: google("gemini-2.5-flash"),
+        model: google("gemini-2.5-flash-lite"),
         schema: z.object({
           action: z.enum(["search", "refuse", "chitchat"]),
           query: z.string().describe("a clean retrieval query when action=search"),
@@ -53,7 +53,7 @@ export async function POST(req: Request) {
 
       if (route.action !== "search") {
         const r = streamText({
-          model: google("gemini-2.5-flash"),
+          model: google("gemini-2.5-flash-lite"),
           system: "Reply briefly and naturally.",
           prompt: route.reply || "Hello!",
         });
@@ -66,7 +66,7 @@ export async function POST(req: Request) {
 
       if (hits.length === 0) {
         const r = streamText({
-          model: google("gemini-2.5-flash"),
+          model: google("gemini-2.5-flash-lite"),
           prompt:
             "Say, honestly and briefly, that the corpus doesn't contain " +
             "information to answer this question.",

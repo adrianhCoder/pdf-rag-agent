@@ -14,7 +14,7 @@ const STARTERS = [
 ];
 
 export default function Home() {
-  const { messages, sendMessage, status } = useChat();
+  const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState("");
   const busy = status === "submitted" || status === "streaming";
   const waiting = status === "submitted"; // before the first token streams
@@ -102,6 +102,15 @@ export default function Home() {
             <span></span>
             <span></span>
             <span></span>
+          </div>
+        )}
+
+        {error && (
+          <div className="message assistant error-msg">
+            ⚠️{" "}
+            {/quota|rate limit|429/i.test(error.message ?? "")
+              ? "Gemini's free tier just hit its rate limit. Wait a few seconds and try again."
+              : error.message || "Something went wrong — please try again."}
           </div>
         )}
       </div>
