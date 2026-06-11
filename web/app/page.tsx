@@ -9,6 +9,7 @@ export default function Home() {
   const { messages, sendMessage, status } = useChat();
   const [input, setInput] = useState("");
   const busy = status === "submitted" || status === "streaming";
+  const waiting = status === "submitted"; // before the first token streams
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -19,26 +20,25 @@ export default function Home() {
   }
 
   return (
-    <div className="shell">
-      <header>
+    <div className="chat-container">
+      <header className="chat-header">
         <h1>Visual RAG Agent</h1>
         <p>
-          Ask about the indexed illustrated textbooks — including their figures and
-          diagrams. Answers are grounded on the retrieved pages shown below each reply.
+          Ask about the indexed illustrated documents — figures and diagrams included.
+          Answers are grounded on the source pages shown beneath each reply.
         </p>
       </header>
 
-      {messages.map((m) => (
-        <div key={m.id} className={`msg ${m.role}`}>
-          <div className="role">{m.role === "user" ? "you" : "AI"}</div>
-          <div className={`bubble ${m.role}`}>
+      <div className="messages-area">
+        {messages.map((m) => (
+          <div key={m.id} className={`message ${m.role}`}>
             {m.parts.map((p, i) => {
               if (p.type === "text") return <span key={i}>{p.text}</span>;
               if (p.type === "data-sources") {
                 const sources = (p as { data: Source[] }).data;
                 return (
                   <div className="sources" key={i}>
-                    <div className="sources-label">Retrieved pages</div>
+                    <div className="sources-label">Source pages</div>
                     <div className="thumbs">
                       {sources.map((s, j) => (
                         <a key={j} href={s.image_url} target="_blank" rel="noreferrer" className="thumb">
@@ -54,21 +54,27 @@ export default function Home() {
               return null;
             })}
           </div>
-        </div>
-      ))}
+        ))}
 
-      {busy && <div className="hint">retrieving & reading pages…</div>}
+        {waiting && (
+          <div className="thinking-dots">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        )}
+      </div>
 
-      <form onSubmit={onSubmit}>
+      <form className="composer-area" onSubmit={onSubmit}>
         <div className="composer">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder="e.g. What does the diagram of the water cycle show?"
+            placeholder="Ask about the documents…"
             disabled={busy}
           />
-          <button type="submit" disabled={busy || !input.trim()}>
+          <button className="send-btn" type="submit" disabled={busy || !input.trim()}>
             Send
           </button>
         </div>
