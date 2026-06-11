@@ -54,12 +54,23 @@ html, body {
   padding: 1.5rem 1.5rem 0;
 }
 
-.chat-header { padding: 0.5rem 0.25rem 1rem; }
+.robot-zone {
+  flex: 0 0 auto;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+.robot-zone .robot-face-container { transform: scale(0.36); }
+
+.chat-header { padding: 0 0.25rem 1rem; text-align: center; }
 .chat-header h1 { font-size: 1.4rem; font-weight: 600; margin: 0 0 0.25rem; }
-.chat-header p { margin: 0; color: var(--muted); font-size: 0.9rem; font-weight: 300; line-height: 1.5; }
+.chat-header p { margin: 0 auto; max-width: 520px; color: var(--muted); font-size: 0.9rem; font-weight: 300; line-height: 1.5; }
 
 .messages-area {
   flex-grow: 1;
+  min-height: 0;
   overflow-y: auto;
   display: flex;
   flex-direction: column;

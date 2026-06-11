@@ -2,6 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
+import RobotFace, { type RobotState } from "@/components/RobotFace";
 
 type Source = { book: string; page: number; image_url: string; score: number };
 
@@ -10,6 +11,10 @@ export default function Home() {
   const [input, setInput] = useState("");
   const busy = status === "submitted" || status === "streaming";
   const waiting = status === "submitted"; // before the first token streams
+
+  // Drive the robot's expression from the chat state.
+  const robotState: RobotState =
+    status === "streaming" ? "talking" : status === "submitted" ? "thinking" : "neutral";
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -21,6 +26,10 @@ export default function Home() {
 
   return (
     <div className="chat-container">
+      <div className="robot-zone">
+        <RobotFace state={robotState} />
+      </div>
+
       <header className="chat-header">
         <h1>Visual RAG Agent</h1>
         <p>

@@ -1,0 +1,256 @@
+/* RobotFace — ported from learn_english_voicechat */
+.robot-face-container {
+  /* BASE THEME (Default White) */
+  --head-bg: radial-gradient(circle at 50% 30%, #ffffff, #d8d8e0);
+  --head-shadow: inset -15px -15px 50px rgba(0, 0, 0, 0.15), 0 30px 60px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.4);
+  --feature-color: #1a1a1a;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  transition: all 0.5s ease-in-out;
+  perspective: 1000px;
+}
+
+/* COLORED THEME (Cyberpunk/Neon) */
+.robot-face-container.theme-colored {
+  --head-bg: radial-gradient(circle at 30% 30%, #2a0050, #0a0015);
+  --head-shadow: 0 20px 50px rgba(255, 0, 255, 0.2), inset 0px -20px 40px rgba(0, 0, 0, 0.8), 0 0 30px rgba(0, 255, 255, 0.3);
+  --feature-color: #00ffff;
+}
+
+.robot-head {
+  width: 300px;
+  height: 400px;
+  background: var(--head-bg);
+  border-radius: 150px 150px 80px 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--head-shadow);
+  position: relative;
+  transition: transform 0.1s ease-out, background 0.5s, box-shadow 0.5s;
+  transform-style: preserve-3d;
+}
+
+.robot-face-container.theme-colored .eye,
+.robot-face-container.theme-colored .mouth {
+  box-shadow: 0 0 10px var(--feature-color);
+}
+
+.eyes-container {
+  display: flex;
+  gap: 60px;
+  margin-bottom: 30px;
+  transform: translateY(-20px) translateZ(30px);
+}
+
+.eye {
+  width: 22px;
+  height: 38px;
+  background-color: var(--feature-color);
+  border-radius: 11px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mouth-container {
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transform: translateZ(40px);
+}
+
+.mouth {
+  width: 32px;
+  height: 12px;
+  border-radius: 0 0 16px 16px;
+  background-color: transparent;
+  border-bottom: 4px solid var(--feature-color);
+  border-left: 3px solid var(--feature-color);
+  border-right: 3px solid var(--feature-color);
+  border-top: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* --- Core States --- */
+.listening .mouth {
+  width: 45px;
+  height: 25px;
+  border-radius: 5px 5px 25px 25px;
+  background-color: var(--feature-color);
+  border: none;
+}
+
+.listening .eye {
+  width: 24px;
+  height: 35px;
+  border-radius: 12px;
+}
+
+.thinking .eye {
+  height: 22px;
+  width: 12px;
+  border-radius: 4px;
+}
+
+.thinking .left-eye { transform: translateX(15px) !important; }
+.thinking .right-eye { transform: translateX(15px) !important; }
+
+.thinking .mouth {
+  width: 30px;
+  height: 6px;
+  border-radius: 3px;
+  background-color: var(--feature-color);
+  border: none;
+  transform: translateX(5px) !important;
+}
+
+.thinking .robot-head { animation: think-hard 1.5s infinite ease-in-out; }
+
+@keyframes think-hard {
+  0%   { transform: rotateZ(3deg) translateY(0); }
+  25%  { transform: rotateZ(-3deg) translateY(-8px); }
+  50%  { transform: rotateZ(2deg) translateY(-5px); }
+  75%  { transform: rotateZ(-1deg) translateY(-2px); }
+  100% { transform: rotateZ(3deg) translateY(0); }
+}
+
+.talking .mouth {
+  border: none;
+  background-color: var(--feature-color);
+  animation: super-talk 0.8s infinite cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.talking .eye {
+  height: 48px;
+  width: 22px;
+  border-radius: 20px 20px 10px 10px;
+}
+
+@keyframes super-talk {
+  0%   { height: 8px;  width: 36px; border-radius: 3px; }
+  25%  { height: 26px; width: 18px; border-radius: 9px; }
+  50%  { height: 12px; width: 44px; border-radius: 2px 2px 10px 10px; }
+  75%  { height: 18px; width: 32px; border-radius: 10px 10px 4px 4px; }
+  100% { height: 8px;  width: 36px; border-radius: 3px; }
+}
+
+/* Glitch / Dizzy (poked) */
+.glitch .eye {
+  border-radius: 0;
+  width: 14px;
+  height: 14px;
+  animation: dizzy-eyes 0.15s infinite;
+  box-shadow: 14px 14px 0 var(--feature-color), -14px -14px 0 var(--feature-color);
+  background-color: transparent;
+}
+
+@keyframes dizzy-eyes {
+  0%   { transform: scale(1) rotate(0deg); }
+  50%  { transform: scale(1.2) rotate(90deg); }
+  100% { transform: scale(1) rotate(180deg); }
+}
+
+.glitch .mouth {
+  border-radius: 0;
+  width: 14px;
+  height: 14px;
+  border: none;
+  background-color: transparent;
+  box-shadow:
+    -20px -10px 0 var(--feature-color),
+    20px -10px 0 var(--feature-color),
+    -10px 0px 0 var(--feature-color),
+    10px 0px 0 var(--feature-color),
+    0px 10px 0 var(--feature-color);
+  transform: translateY(10px) !important;
+}
+
+.shake-head {
+  animation: shake 0.3s cubic-bezier(.36, .07, .19, .97) infinite;
+  transform: translate3d(0, 0, 0);
+  backface-visibility: hidden;
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-2px, 0, 0); }
+  20%, 80% { transform: translate3d(4px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-8px, 0, 0); }
+  40%, 60% { transform: translate3d(8px, 0, 0); }
+}
+
+/* --- Idle Engine States --- */
+.blink .eye { height: 4px !important; margin-top: 23px; }
+
+.look-left .eye { transform: translateX(-15px) !important; }
+.look-left .mouth { transform: translateX(-10px) !important; width: 30px; }
+
+.look-right .eye { transform: translateX(15px) !important; }
+.look-right .mouth { transform: translateX(10px) !important; width: 30px; }
+
+.hum .mouth {
+  height: 6px;
+  width: 30px;
+  border-radius: 10px;
+  border: none;
+  background-color: var(--feature-color);
+  transform: translateY(-5px) !important;
+}
+
+@keyframes float {
+  0%   { padding-top: 0px; }
+  50%  { padding-top: 20px; }
+  100% { padding-top: 0px; }
+}
+
+.robot-face-container:not(.thinking):not(.pong) {
+  animation: float 6s ease-in-out infinite;
+}
+
+/* --- Easter Egg: Pong (10s idle) --- */
+.pong .eyes-container { gap: 80px; }
+
+.pong .eye { width: 10px; height: 45px; border-radius: 4px; }
+
+.pong .left-eye {
+  transform: translateX(-15px) !important;
+  animation: pong-paddle-l 0.6s infinite alternate linear;
+}
+.pong .right-eye {
+  transform: translateX(15px) !important;
+  animation: pong-paddle-r 0.6s infinite alternate linear;
+}
+
+@keyframes pong-paddle-l {
+  0%   { transform: translateY(-20px) translateX(-15px); }
+  100% { transform: translateY(20px) translateX(-15px); }
+}
+@keyframes pong-paddle-r {
+  0%   { transform: translateY(20px) translateX(15px); }
+  100% { transform: translateY(-20px) translateX(15px); }
+}
+
+.pong .mouth {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: none;
+  background-color: var(--feature-color);
+  position: absolute;
+  top: -65px;
+  left: 50%;
+  margin-left: -6px;
+  animation: pong-ball 1.2s infinite linear;
+}
+
+@keyframes pong-ball {
+  0%   { transform: translate(-45px, 0px); }
+  25%  { transform: translate(0px, 20px); }
+  50%  { transform: translate(45px, 0px); }
+  75%  { transform: translate(0px, -20px); }
+  100% { transform: translate(-45px, 0px); }
+}
