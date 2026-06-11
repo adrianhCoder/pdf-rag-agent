@@ -73,6 +73,7 @@ def embed_text(text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> list[float]:
         "model": f"models/{config.EMBED_MODEL}",
         "content": {"parts": [{"text": text.strip() or " "}]},
         "taskType": task_type,
+        "outputDimensionality": config.VECTOR_DIM,
     }
     resp = requests.post(
         EMBED_URL,

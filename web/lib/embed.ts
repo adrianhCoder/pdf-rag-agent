@@ -1,6 +1,6 @@
 /** Embed the user's query with Gemini text-embedding-004 (RETRIEVAL_QUERY). */
 const KEY = process.env.GOOGLE_GENERATIVE_AI_API_KEY!;
-const MODEL = "text-embedding-004";
+const MODEL = "gemini-embedding-001";
 const URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:embedContent`;
 
 export async function embedQuery(query: string): Promise<number[]> {
@@ -11,6 +11,7 @@ export async function embedQuery(query: string): Promise<number[]> {
       model: `models/${MODEL}`,
       content: { parts: [{ text: query }] },
       taskType: "RETRIEVAL_QUERY",
+      outputDimensionality: 768,
     }),
   });
   if (!res.ok) throw new Error(`Gemini embed failed: ${res.status} ${await res.text()}`);

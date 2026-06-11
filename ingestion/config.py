@@ -11,8 +11,8 @@ QDRANT_API_KEY = os.environ["QDRANT_API_KEY"]
 QDRANT_COLLECTION = os.environ.get("QDRANT_COLLECTION", "visual_rag_pages")
 GOOGLE_API_KEY = os.environ["GOOGLE_GENERATIVE_AI_API_KEY"]
 
-# Gemini text-embedding-004 -> 768-dim single vector per page.
-EMBED_MODEL = "text-embedding-004"
+# Gemini embeddings -> single vector per page (768-dim via Matryoshka).
+EMBED_MODEL = "gemini-embedding-001"
 VECTOR_DIM = 768
 
 # Render + batching knobs.
@@ -27,7 +27,9 @@ MAX_PAGES_PER_PDF = int(os.environ.get("MAX_PAGES_PER_PDF", "100"))
 def qdrant_client():
     from qdrant_client import QdrantClient
 
-    return QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=120)
+    return QdrantClient(
+        url=QDRANT_URL, api_key=QDRANT_API_KEY, timeout=120, check_compatibility=False
+    )
 
 
 def ensure_collection(client):
