@@ -8,8 +8,7 @@ those page **images** with a vision LLM, and answers with the source pages cited
 > **Design in one line:** *text to search, vision to answer.* Retrieval runs on
 > **text embeddings** (precise for labelled technical pages); the answer is
 > grounded by a **vision model that reads the page images** (so charts and
-> diagrams are first-class). See [`docs/ARQUITECTURA_DEEP_DIVE`](docs/) for the
-> full end-to-end walkthrough.
+> diagrams are first-class).
 
 > **Why "agent" and not just a RAG chatbot:** `/api/chat` runs a small decision
 > loop. A router LLM first decides **search / chit-chat / refuse**; only on

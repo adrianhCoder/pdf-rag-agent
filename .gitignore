@@ -24,6 +24,10 @@ page_images/
 *.png
 *.jpg
 
+# Internal / personal (not for the public portfolio repo)
+CLAUDE.md
+docs/
+
 # OS
 .DS_Store
 Thumbs.db
