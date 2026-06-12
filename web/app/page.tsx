@@ -7,6 +7,21 @@ import RobotFace, { type RobotState } from "@/components/RobotFace";
 
 type Source = { book: string; page: number; image_url: string; score: number };
 
+const BLOB = "https://9c8zzkmp2kpc5vxu.public.blob.vercel-storage.com/pages";
+
+const BOOKS = [
+  {
+    title: "Visual Aircraft Recognition",
+    sub: "US Army · FM 3-01.80 — aircraft identification",
+    cover: `${BLOB}/US_Army_Aircraft_Recognition/p0001.png`,
+  },
+  {
+    title: "Powerplant Handbook",
+    sub: "FAA · FAA-H-8083-32 — aircraft engines",
+    cover: `${BLOB}/FAA_Powerplant_Handbook/p0001.png`,
+  },
+];
+
 const STARTERS = [
   "Where are combat aircraft? Show me the pages.",
   "How do you identify or recognize an aircraft?",
@@ -54,11 +69,22 @@ export default function Home() {
         {messages.length === 0 && (
           <div className="welcome">
             <p className="welcome-corpus">
-              📚 Indexed corpus: <b>US Army — Visual Aircraft Recognition</b> and the{" "}
-              <b>FAA Aviation Maintenance — Powerplant Handbook</b>. Ask about aircraft
-              identification/recognition or aircraft engines — the agent finds the
-              relevant pages and answers from what they actually show.
+              📚 Two illustrated manuals are indexed for this chat. Ask about aircraft
+              identification or aircraft engines — the agent finds the relevant pages and
+              answers from what they actually show.
             </p>
+            <div className="corpus-books">
+              {BOOKS.map((b, i) => (
+                <div className="book-card" key={i}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={b.cover} alt={`${b.title} cover`} />
+                  <div className="book-meta">
+                    <span className="book-title">{b.title}</span>
+                    <span className="book-sub">{b.sub}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
             <div className="starters-label">Try asking</div>
             <div className="starters">
               {STARTERS.map((s, i) => (
@@ -121,8 +147,8 @@ export default function Home() {
           <div className="message assistant error-msg">
             ⚠️{" "}
             {/quota|rate limit|429/i.test(error.message ?? "")
-              ? "Gemini's free tier just hit its rate limit. Wait a few seconds and try again."
-              : error.message || "Something went wrong — please try again."}
+              ? "Easy there, speed reader! 📚 You're flipping pages faster than I can read them. Give me a few seconds to catch my breath and try again."
+              : error.message || "Something went wrong on my end — give it another try."}
           </div>
         )}
       </div>

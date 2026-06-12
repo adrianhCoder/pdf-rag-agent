@@ -8,6 +8,7 @@ import {
 } from "ai";
 import { z } from "zod";
 import { searchPages } from "@/lib/search";
+import { rateLimit } from "@/lib/ratelimit";
 
 export const maxDuration = 60;
 
@@ -28,6 +29,16 @@ function lastUserText(messages: UIMessage[]): string {
 }
 
 export async function POST(req: Request) {
+  // Throttle the public endpoint before spending any LLM call.
+  const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown";
+  const limit = rateLimit(ip);
+  if (!limit.ok) {
+    return new Response(
+      `Rate limit reached — please wait ${limit.retryAfter}s and try again.`,
+      { status: 429, headers: { "Retry-After": String(limit.retryAfter) } }
+    );
+  }
+
   const { messages }: { messages: UIMessage[] } = await req.json();
   const question = lastUserText(messages);
 
