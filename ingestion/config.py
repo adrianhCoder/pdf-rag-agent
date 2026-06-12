@@ -19,9 +19,11 @@ VECTOR_DIM = 768
 RENDER_DPI = 150
 UPSERT_BATCH = 16  # points per Qdrant upsert
 
-# Cap pages per PDF so you can drop full books without trimming them by hand.
-# Protects the Qdrant free tier (1 GiB RAM). 0 = no cap. Override via env.
-MAX_PAGES_PER_PDF = int(os.environ.get("MAX_PAGES_PER_PDF", "100"))
+# Cap pages per PDF. 0 = no cap (default). Override via env.
+# Note: with single-vector text embeddings, one page = ~3 KB, so the Qdrant
+# free tier (1 GiB RAM) fits ~100k pages — the cap is no longer needed. It was
+# only relevant in the ColPali era (multivector: hundreds of vectors per page).
+MAX_PAGES_PER_PDF = int(os.environ.get("MAX_PAGES_PER_PDF", "0"))
 
 
 def qdrant_client():
