@@ -2,6 +2,7 @@
 
 import { useChat } from "@ai-sdk/react";
 import { useState } from "react";
+import ReactMarkdown from "react-markdown";
 import RobotFace, { type RobotState } from "@/components/RobotFace";
 
 type Source = { book: string; page: number; image_url: string; score: number };
@@ -39,10 +40,13 @@ export default function Home() {
 
       <main className="chat-pane">
       <header className="chat-header">
-        <h1>Visual RAG Agent</h1>
+        <span className="eyebrow">Agentic · Multimodal Retrieval</span>
+        <h1>
+          Visual <span className="grad">RAG</span> Agent
+        </h1>
         <p>
-          An agentic <b>visual RAG</b>: it reads the actual document pages (figures and
-          diagrams included) and answers with the source pages cited.
+          It reads the actual document pages — <b>figures and diagrams included</b> — and
+          answers with the source pages cited.
         </p>
       </header>
 
@@ -74,7 +78,14 @@ export default function Home() {
         {messages.map((m) => (
           <div key={m.id} className={`message ${m.role}`}>
             {m.parts.map((p, i) => {
-              if (p.type === "text") return <span key={i}>{p.text}</span>;
+              if (p.type === "text")
+                return m.role === "assistant" ? (
+                  <div className="md" key={i}>
+                    <ReactMarkdown>{p.text}</ReactMarkdown>
+                  </div>
+                ) : (
+                  <span key={i}>{p.text}</span>
+                );
               if (p.type === "data-sources") {
                 const sources = (p as { data?: Source[] }).data ?? [];
                 if (sources.length === 0) return null;
