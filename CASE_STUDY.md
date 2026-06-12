@@ -2,7 +2,7 @@
 
 **Author:** Adrianh de Lucio Chavero
 **Type:** Personal project (built as proof of work; no confidential or client material)
-**Live demo:** _<add Vercel URL>_  ·  **Repo:** https://github.com/adrianhCoder/pdf-rag-agent
+**Live demo:** https://pdf-rag-agent.vercel.app  ·  **Repo:** https://github.com/adrianhCoder/pdf-rag-agent
 
 ---
 

@@ -1,5 +1,7 @@
 # Visual RAG Agent — Multimodal Q&A over illustrated PDFs
 
+**🔗 Live demo: https://pdf-rag-agent.vercel.app**
+
 An **agentic, multimodal RAG** system that answers questions about a corpus of
 illustrated PDF books — reasoning over **figures and diagrams**, not just text.
 Built as a portfolio proof-of-work: it retrieves the most relevant pages, reads
