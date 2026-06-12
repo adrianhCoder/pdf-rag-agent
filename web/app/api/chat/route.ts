@@ -13,7 +13,7 @@ export const maxDuration = 60;
 
 // Retrieve a broader set to synthesize a complete answer from, but only surface
 // the strongest few to the user as image thumbnails.
-const CONTEXT_PAGES = 6; // pages GPT-4o reads to compose the answer
+const CONTEXT_PAGES = 6; // pages the vision model reads to compose the answer
 const DISPLAY_PAGES = 3; // top pages shown to the user as thumbnails
 
 /** Pull the plain text out of the latest user UIMessage. */
@@ -61,7 +61,7 @@ export async function POST(req: Request) {
         return;
       }
 
-      // ── 2. Retrieve relevant pages (visual late-interaction search) ───────
+      // ── 2. Retrieve relevant pages (text-embedding cosine search) ─────────
       const hits = await searchPages(route.query || question, CONTEXT_PAGES);
 
       if (hits.length === 0) {

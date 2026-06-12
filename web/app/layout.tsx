@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Visual RAG Agent",
-  description: "Agentic multimodal Q&A over illustrated PDFs (ColPali + Qdrant + GPT-4o)",
+  description: "Agentic multimodal Q&A over illustrated PDFs — text-embedding retrieval + Gemini vision answering, with cited source pages",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
