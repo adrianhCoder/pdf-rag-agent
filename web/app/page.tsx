@@ -32,11 +32,12 @@ export default function Home() {
   }
 
   return (
-    <div className="chat-container">
-      <div className="robot-zone">
+    <div className="app-layout">
+      <aside className="avatar-pane">
         <RobotFace state={robotState} />
-      </div>
+      </aside>
 
+      <main className="chat-pane">
       <header className="chat-header">
         <h1>Visual RAG Agent</h1>
         <p>
@@ -129,6 +130,7 @@ export default function Home() {
           </button>
         </div>
       </form>
+      </main>
     </div>
   );
 }
