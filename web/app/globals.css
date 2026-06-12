@@ -265,6 +265,20 @@ html, body {
 .thinking-dots span:nth-child(2) { animation-delay: 0.2s; }
 .thinking-dots span:nth-child(3) { animation-delay: 0.4s; }
 
+/* "Reading the pages…" indicator (shown while the vision model reads, before text) */
+.reading-indicator {
+  display: flex; align-items: center; gap: 8px;
+  margin-top: 0.85rem; color: var(--muted); font-size: 0.9rem; font-weight: 300;
+  animation: messageSlide 0.3s ease-out;
+}
+.reading-dots { display: inline-flex; align-items: center; gap: 4px; }
+.reading-dots span {
+  width: 6px; height: 6px; border-radius: 50%; background: var(--accent-color);
+  animation: smoothBlink 1.4s infinite cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+.reading-dots span:nth-child(2) { animation-delay: 0.2s; }
+.reading-dots span:nth-child(3) { animation-delay: 0.4s; }
+
 /* Composer */
 .composer-area { padding: 1rem 0 1.5rem; }
 .composer {

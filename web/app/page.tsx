@@ -101,39 +101,61 @@ export default function Home() {
           </div>
         )}
 
-        {messages.map((m) => (
-          <div key={m.id} className={`message ${m.role}`}>
-            {m.parts.map((p, i) => {
-              if (p.type === "text")
-                return m.role === "assistant" ? (
-                  <div className="md" key={i}>
-                    <ReactMarkdown>{p.text}</ReactMarkdown>
-                  </div>
-                ) : (
-                  <span key={i}>{p.text}</span>
-                );
-              if (p.type === "data-sources") {
-                const sources = (p as { data?: Source[] }).data ?? [];
-                if (sources.length === 0) return null;
-                return (
-                  <div className="sources" key={i}>
-                    <div className="sources-label">Source pages</div>
-                    <div className="thumbs">
-                      {sources.map((s, j) => (
-                        <a key={j} href={s.image_url} target="_blank" rel="noreferrer" className="thumb">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={s.image_url} alt={`${s.book} p.${s.page}`} />
-                          <span>{s.book} · p.{s.page}</span>
-                        </a>
-                      ))}
+        {messages.map((m, mi) => {
+          const isLast = mi === messages.length - 1;
+          const hasText = m.parts.some(
+            (p) => p.type === "text" && (p as { text?: string }).text?.trim()
+          );
+          const hasSources = m.parts.some(
+            (p) =>
+              p.type === "data-sources" &&
+              ((p as { data?: Source[] }).data?.length ?? 0) > 0
+          );
+          // Fill the gap after the source pages render while the vision model
+          // reads them and before the first answer token streams in.
+          const reading =
+            m.role === "assistant" && isLast && busy && hasSources && !hasText;
+
+          return (
+            <div key={m.id} className={`message ${m.role}`}>
+              {m.parts.map((p, i) => {
+                if (p.type === "text")
+                  return m.role === "assistant" ? (
+                    <div className="md" key={i}>
+                      <ReactMarkdown>{p.text}</ReactMarkdown>
                     </div>
-                  </div>
-                );
-              }
-              return null;
-            })}
-          </div>
-        ))}
+                  ) : (
+                    <span key={i}>{p.text}</span>
+                  );
+                if (p.type === "data-sources") {
+                  const sources = (p as { data?: Source[] }).data ?? [];
+                  if (sources.length === 0) return null;
+                  return (
+                    <div className="sources" key={i}>
+                      <div className="sources-label">Source pages</div>
+                      <div className="thumbs">
+                        {sources.map((s, j) => (
+                          <a key={j} href={s.image_url} target="_blank" rel="noreferrer" className="thumb">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={s.image_url} alt={`${s.book} p.${s.page}`} />
+                            <span>{s.book} · p.{s.page}</span>
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              })}
+              {reading && (
+                <div className="reading-indicator">
+                  <span className="reading-label">Reading the pages</span>
+                  <span className="reading-dots"><span></span><span></span><span></span></span>
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         {waiting && (
           <div className="thinking-dots">
