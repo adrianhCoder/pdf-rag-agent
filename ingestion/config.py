@@ -15,6 +15,12 @@ GOOGLE_API_KEY = os.environ["GOOGLE_GENERATIVE_AI_API_KEY"]
 EMBED_MODEL = "gemini-embedding-001"
 VECTOR_DIM = 768
 
+# Vision enrichment: a Gemini vision model describes each page image at ingest
+# (figures, tables, key terms) and that description is embedded alongside the
+# extracted text, so figure-heavy/scanned pages become retrievable by meaning.
+# Set DESCRIBE_MODEL="" to disable and embed raw text only.
+DESCRIBE_MODEL = os.environ.get("DESCRIBE_MODEL", "gemini-2.5-flash")
+
 # Render + batching knobs.
 RENDER_DPI = 150
 UPSERT_BATCH = 16  # points per Qdrant upsert

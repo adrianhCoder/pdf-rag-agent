@@ -20,6 +20,7 @@ out/
 # Data / artifacts
 pdfs/
 page_images/
+backups/
 *.pdf
 *.png
 *.jpg
@@ -31,3 +32,6 @@ docs/
 # OS
 .DS_Store
 Thumbs.db
+
+# Claude Code local settings
+.claude/

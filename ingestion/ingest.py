@@ -1,10 +1,12 @@
 """
 Ingestion pipeline: PDF -> per-page (text + image).
-  - text  -> Gemini text embedding  -> Qdrant (single vector, for retrieval)
+  - image -> Gemini vision description (figures, tables, key terms)
+  - text + description -> Gemini text embedding -> Qdrant (single vector)
   - image -> Vercel Blob (public URL, read later by the vision model to answer)
 
-Retrieval is by TEXT (precise for labelled pages); answering is by VISION
-(Gemini reads the page image, figures included). Robust + resumable:
+Retrieval is by TEXT enriched with a VISION-derived description (so diagram
+pages are retrievable by meaning, not just their sparse text); answering is by
+VISION (Gemini reads the page image, figures included). Robust + resumable:
 deterministic ids per (book, page) and retry-with-backoff on transient errors.
 
 Usage:
@@ -12,6 +14,7 @@ Usage:
     python ingest.py ./pdfs            # folder of .pdf files
     python ingest.py ./pdfs/book.pdf   # or a single file
 """
+import base64
 import sys
 import time
 import uuid
@@ -25,6 +28,18 @@ import config
 
 EMBED_URL = (
     f"https://generativelanguage.googleapis.com/v1beta/models/{config.EMBED_MODEL}:embedContent"
+)
+DESCRIBE_URL = (
+    "https://generativelanguage.googleapis.com/v1beta/models/"
+    f"{config.DESCRIBE_MODEL}:generateContent"
+)
+
+DESCRIBE_PROMPT = (
+    "You are indexing a textbook page for search. Describe this page concisely "
+    "so it can be retrieved later: state the main topic, then name each figure, "
+    "diagram or table and what it shows, and list the key technical terms, "
+    "labels and part names visible. Write in the same language as the page. "
+    "Plain text only, at most 150 words."
 )
 
 
@@ -85,6 +100,34 @@ def embed_text(text: str, task_type: str = "RETRIEVAL_DOCUMENT") -> list[float]:
     return resp.json()["embedding"]["values"]
 
 
+def describe_page(png: bytes) -> str:
+    """Gemini vision -> short retrieval-oriented description of the page image."""
+    if not config.DESCRIBE_MODEL:
+        return ""
+    body = {
+        "contents": [
+            {
+                "parts": [
+                    {"inline_data": {"mime_type": "image/png", "data": base64.b64encode(png).decode()}},
+                    {"text": DESCRIBE_PROMPT},
+                ]
+            }
+        ]
+    }
+    resp = requests.post(
+        DESCRIBE_URL,
+        headers={"x-goog-api-key": config.GOOGLE_API_KEY, "Content-Type": "application/json"},
+        json=body,
+        timeout=120,
+    )
+    resp.raise_for_status()
+    candidates = resp.json().get("candidates", [])
+    if not candidates:  # e.g. safety-blocked page — fall back to raw text only
+        return ""
+    parts = candidates[0].get("content", {}).get("parts", [])
+    return " ".join(p["text"] for p in parts if "text" in p).strip()
+
+
 def upload_image(book: str, page: int, png: bytes) -> str:
     """Upload a page PNG to Vercel Blob; return its public URL."""
     safe_book = book.replace(" ", "_")
@@ -139,15 +182,22 @@ def main():
         for page_no, png, text in render_pages(pdf_path):
             if point_id(book, page_no) in existing:
                 continue
+            # Vision description makes figure-heavy pages retrievable by meaning.
+            desc = with_retry(lambda p=png: describe_page(p), what="Gemini describe")
             # Prepend the book title so sparse/image-only pages still carry context.
-            doc_text = f"{book}\n\n{text}"
+            doc_text = f"{book}\n\n{text}\n\n{desc}".strip()
             emb = with_retry(lambda t=doc_text: embed_text(t), what="Gemini embed")
             url = with_retry(lambda p=png, n=page_no: upload_image(book, n, p), what="Blob upload")
             pending.append(
                 models.PointStruct(
                     id=point_id(book, page_no),
                     vector=emb,
-                    payload={"book": book, "page": page_no, "image_url": url},
+                    payload={
+                        "book": book,
+                        "page": page_no,
+                        "image_url": url,
+                        "description": desc,
+                    },
                 )
             )
             if len(pending) >= config.UPSERT_BATCH:

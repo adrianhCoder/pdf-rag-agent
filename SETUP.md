@@ -28,10 +28,27 @@ cd ingestion
 pip install -r requirements.txt
 python ingest.py ../pdfs
 ```
-For each page this: renders a PNG + extracts text, embeds the **text** via Gemini
-(`gemini-embedding-001`, 768-d), uploads the image to Vercel Blob, and upserts a
-single-vector point `{ vector, payload:{book,page,image_url} }` into Qdrant.
+For each page this: renders a PNG + extracts text, asks Gemini vision
+(`gemini-2.5-flash`) for a short description of the page (figures, tables, key
+terms — set `DESCRIBE_MODEL=""` to skip), embeds **text + description** via
+Gemini (`gemini-embedding-001`, 768-d), uploads the image to Vercel Blob, and
+upserts a single-vector point
+`{ vector, payload:{book,page,image_url,description} }` into Qdrant.
 Re-runnable: deterministic `uuid5(book|page)` IDs skip already-indexed pages.
+
+### 3b. Back up the collection (recommended)
+Qdrant Cloud **suspends** free clusters after 1 idle week and **deletes** them
+after 4. Two layers of protection:
+```bash
+python backup.py dump      # local snapshot -> ../backups/<collection>.jsonl
+python backup.py restore   # seconds to rebuild a new cluster, no re-embedding
+```
+Plus a scheduled keep-alive (`.github/workflows/qdrant-keepalive.yml`) that
+queries the cluster every 3 days. Enable it by adding repo secrets
+`QDRANT_URL` + `QDRANT_API_KEY` (Settings → Secrets and variables → Actions),
+then trigger it once manually (Actions → *Qdrant keep-alive* → Run workflow)
+to verify. Note: GitHub pauses scheduled workflows in repos with no activity
+for 60 days — re-enable from the Actions tab if you see that banner.
 
 ## 4. Run / deploy the web app
 ```bash

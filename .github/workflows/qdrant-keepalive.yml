@@ -1,0 +1,36 @@
+# Keeps the Qdrant Cloud free-tier cluster active. Free clusters are suspended
+# after 1 week without API traffic and DELETED after 4 weeks — this issues a
+# real data query every 3 days so that never happens.
+#
+# Required repo secrets (Settings -> Secrets and variables -> Actions):
+#   QDRANT_URL         e.g. https://xyz.cloud.qdrant.io:6333
+#   QDRANT_API_KEY
+#   QDRANT_COLLECTION  optional, defaults to visual_rag_pages
+name: Qdrant keep-alive
+
+on:
+  schedule:
+    - cron: "0 8 */3 * *" # every 3 days at 08:00 UTC
+  workflow_dispatch: {} # allow manual runs to test the secrets
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Query one point so the cluster registers activity
+        env:
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          QDRANT_COLLECTION: ${{ secrets.QDRANT_COLLECTION || 'visual_rag_pages' }}
+        run: |
+          set -euo pipefail
+          code=$(curl -sS -o resp.json -w '%{http_code}' \
+            -X POST "$QDRANT_URL/collections/$QDRANT_COLLECTION/points/scroll" \
+            -H "api-key: $QDRANT_API_KEY" \
+            -H 'Content-Type: application/json' \
+            -d '{"limit": 1}')
+          echo "HTTP $code"
+          cat resp.json
+          # A non-200 means the cluster is suspended, deleted, or misconfigured —
+          # fail loudly so GitHub emails a workflow-failure notification.
+          [ "$code" = "200" ]
