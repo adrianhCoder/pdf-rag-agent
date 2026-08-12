@@ -35,9 +35,17 @@ export default function Home() {
   const busy = status === "submitted" || status === "streaming";
   const waiting = status === "submitted"; // before the first token streams
 
-  // Drive the robot's expression from the chat state.
-  const robotState: RobotState =
-    status === "streaming" ? "talking" : status === "submitted" ? "thinking" : "neutral";
+  // Drive the robot's expression from the chat state. "Talking" only while
+  // answer text is actually streaming in — during routing, retrieval and the
+  // vision model reading the pages, it stays "thinking".
+  const lastMsg = messages[messages.length - 1];
+  const speaking =
+    status === "streaming" &&
+    lastMsg?.role === "assistant" &&
+    lastMsg.parts.some(
+      (p) => p.type === "text" && (p as { text?: string }).text?.trim()
+    );
+  const robotState: RobotState = speaking ? "talking" : busy ? "thinking" : "neutral";
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -138,7 +146,7 @@ export default function Home() {
                           <a key={j} href={s.image_url} target="_blank" rel="noreferrer" className="thumb">
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={s.image_url} alt={`${s.book} p.${s.page}`} />
-                            <span>{s.book} · p.{s.page}</span>
+                            <span>{s.book.replace(/_/g, " ")} · p.{s.page}</span>
                           </a>
                         ))}
                       </div>

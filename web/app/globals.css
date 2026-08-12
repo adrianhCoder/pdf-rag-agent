@@ -220,6 +220,7 @@ html, body {
 .sources-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.06em; color: var(--muted); margin-bottom: 0.6rem; }
 .thumbs { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .thumb { display: flex; flex-direction: column; gap: 0.3rem; width: 88px; text-decoration: none; color: var(--muted); font-size: 0.7rem; line-height: 1.3; }
+.thumb span { overflow-wrap: anywhere; } /* long book names wrap inside the 88px column instead of overlapping neighbors */
 .thumb img {
   width: 88px; height: 114px; object-fit: cover; border-radius: 10px;
   border: 1px solid var(--glass-border); background: #fff;
