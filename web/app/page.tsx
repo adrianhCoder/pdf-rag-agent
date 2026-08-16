@@ -23,7 +23,7 @@ const BOOKS = [
 ];
 
 const STARTERS = [
-  "Where are combat aircraft? Show me the pages.",
+  "What does the MiG-29 Fulcrum look like?",
   "How do you identify or recognize an aircraft?",
   "How does a turbofan engine work?",
   "What are the main parts of a reciprocating engine?",

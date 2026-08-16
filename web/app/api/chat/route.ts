@@ -125,17 +125,20 @@ export async function POST(req: Request) {
         })),
       });
 
-      // ── 4. Ground the answer on those pages (Gemini vision) ───────────────
-      const sources = shown.map((h) => `${h.book} · p.${h.page}`).join("; ");
+      // ── 4. Ground the answer on the pages (Gemini vision) ─────────────────
+      // The model reads ALL retrieved pages, not just the displayed thumbnails.
+      const sources = hits.map((h) => `${h.book} · p.${h.page}`).join("; ");
       const r = streamText({
         model: google("gemini-2.5-flash"),
         system:
-          "You answer using ONLY the textbook page images provided. Structure your " +
-          "reply as: (1) a direct 1-2 sentence answer to the question; then (2) a " +
-          "short bullet for EACH page summarizing what it shows (text, figures, " +
-          "diagrams), each ending with its citation as (book · page). Base every " +
-          "claim only on what is visible in the pages — if they don't contain the " +
-          "answer, say so honestly; never invent.",
+          "You answer using ONLY the textbook page images provided. Answer the " +
+          "question directly and naturally first, then support it with what the " +
+          "pages show — text, figures, diagrams — citing the book name and page " +
+          "for each claim, e.g. (Powerplant Handbook · p.77). Draw on the pages " +
+          "that are actually relevant and simply " +
+          "ignore the rest; don't describe pages for their own sake. Base every " +
+          "claim only on what is visible in the pages — if they don't contain " +
+          "the answer, say so honestly; never invent.",
         messages: [
           {
             role: "user",
@@ -146,7 +149,7 @@ export async function POST(req: Request) {
                   ? `Conversation so far (for context only):\n${history}\n\nQuestion: ${question}`
                   : `Question: ${question}`,
               },
-              ...shown.map((h) => ({ type: "image" as const, image: new URL(h.image_url) })),
+              ...hits.map((h) => ({ type: "image" as const, image: new URL(h.image_url) })),
               { type: "text", text: `The pages above are, in order: ${sources}` },
             ],
           },
