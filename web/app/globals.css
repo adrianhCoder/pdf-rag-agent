@@ -139,7 +139,14 @@ html, body {
   backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
   border: 1px solid var(--glass-border); border-radius: 14px;
   padding: 0.6rem 0.8rem; box-shadow: var(--glass-shadow);
+  text-decoration: none; color: inherit;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
+.book-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.16);
+}
+.book-open { font-size: 0.72rem; color: var(--accent-color); font-weight: 500; }
 .book-card img {
   width: 46px; height: 60px; object-fit: cover; flex-shrink: 0;
   border-radius: 6px; background: #fff;

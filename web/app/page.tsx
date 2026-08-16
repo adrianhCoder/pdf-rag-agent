@@ -8,17 +8,20 @@ import RobotFace, { type RobotState } from "@/components/RobotFace";
 type Source = { book: string; page: number; image_url: string; score: number };
 
 const BLOB = "https://9c8zzkmp2kpc5vxu.public.blob.vercel-storage.com/pages";
+const PDFS = "https://9c8zzkmp2kpc5vxu.public.blob.vercel-storage.com/books";
 
 const BOOKS = [
   {
     title: "Visual Aircraft Recognition",
     sub: "US Army · FM 3-01.80 — aircraft identification",
     cover: `${BLOB}/US_Army_Aircraft_Recognition/p0001.png`,
+    pdf: `${PDFS}/US_Army_Aircraft_Recognition.pdf`,
   },
   {
     title: "Powerplant Handbook",
     sub: "FAA · FAA-H-8083-32 — aircraft engines",
     cover: `${BLOB}/FAA_Powerplant_Handbook/p0001.png`,
+    pdf: `${PDFS}/FAA_Powerplant_Handbook.pdf`,
   },
 ];
 
@@ -83,14 +86,22 @@ export default function Home() {
             </p>
             <div className="corpus-books">
               {BOOKS.map((b, i) => (
-                <div className="book-card" key={i}>
+                <a
+                  className="book-card"
+                  key={i}
+                  href={b.pdf}
+                  target="_blank"
+                  rel="noreferrer"
+                  title={`Open ${b.title} (PDF)`}
+                >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={b.cover} alt={`${b.title} cover`} />
                   <div className="book-meta">
                     <span className="book-title">{b.title}</span>
                     <span className="book-sub">{b.sub}</span>
+                    <span className="book-open">Open the PDF ↗</span>
                   </div>
-                </div>
+                </a>
               ))}
             </div>
             <div className="starters-label">Try asking</div>
