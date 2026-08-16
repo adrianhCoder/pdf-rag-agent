@@ -235,6 +235,17 @@ html, body {
 }
 .thumb:hover img { transform: translateY(-3px); }
 
+/* Floating enlarged preview while hovering a source thumbnail */
+.page-preview {
+  position: fixed; z-index: 200; pointer-events: none;
+  transform: translateY(-50%);
+}
+.page-preview img {
+  display: block; max-height: 72vh; max-width: min(420px, 45vw);
+  border-radius: 12px; border: 1px solid var(--glass-border); background: #fff;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.35);
+}
+
 /* Markdown rendering inside assistant bubbles */
 .md { white-space: normal; }
 .md > :first-child { margin-top: 0; }

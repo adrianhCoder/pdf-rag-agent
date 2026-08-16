@@ -35,6 +35,8 @@ const STARTERS = [
 export default function Home() {
   const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState("");
+  // Floating page preview shown while hovering a source thumbnail.
+  const [preview, setPreview] = useState<{ url: string; x: number; y: number } | null>(null);
   const busy = status === "submitted" || status === "streaming";
   const waiting = status === "submitted"; // before the first token streams
 
@@ -154,7 +156,15 @@ export default function Home() {
                       <div className="sources-label">Source pages</div>
                       <div className="thumbs">
                         {sources.map((s, j) => (
-                          <a key={j} href={s.image_url} target="_blank" rel="noreferrer" className="thumb">
+                          <a
+                            key={j}
+                            href={s.image_url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="thumb"
+                            onMouseMove={(e) => setPreview({ url: s.image_url, x: e.clientX, y: e.clientY })}
+                            onMouseLeave={() => setPreview(null)}
+                          >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
                             <img src={s.image_url} alt={`${s.book} p.${s.page}`} />
                             <span>{s.book.replace(/_/g, " ")} · p.{s.page}</span>
@@ -193,6 +203,22 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {preview && (
+        <div
+          className="page-preview"
+          style={{
+            left:
+              preview.x + 24 + 420 > window.innerWidth
+                ? Math.max(8, preview.x - 444)
+                : preview.x + 24,
+            top: Math.min(Math.max(preview.y, 280), window.innerHeight - 280),
+          }}
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={preview.url} alt="Enlarged page preview" />
+        </div>
+      )}
 
       <form className="composer-area" onSubmit={onSubmit}>
         <div className="composer">
