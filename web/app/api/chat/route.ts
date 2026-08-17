@@ -17,6 +17,17 @@ export const maxDuration = 60;
 const CONTEXT_PAGES = 6; // pages the vision model reads to compose the answer
 const DISPLAY_PAGES = 3; // top pages shown to the user as thumbnails
 
+// Fact sheet about the corpus so the router and the chitchat replies can
+// answer meta-questions ("which books do you know?") accurately instead of
+// claiming ignorance about their own library.
+const CORPUS_INFO =
+  "The corpus is exactly 2 illustrated manuals (692 pages total): " +
+  "1) 'Visual Aircraft Recognition' (US Army field manual FM 3-01.80, 192 pages) — " +
+  "identifying military aircraft by sight: profiles, silhouettes, recognition features; " +
+  "2) 'Aviation Maintenance Technician Handbook - Powerplant' (FAA-H-8083-32, 500 pages) — " +
+  "aircraft engines: reciprocating and turbine engines, propellers, fuel, lubrication, " +
+  "ignition and exhaust systems.";
+
 // Conversation memory: the last N turns, as plain text. Text-only history is
 // cheap (no images re-sent), the router uses it to resolve follow-ups into a
 // standalone retrieval query, and the answer model uses it for continuity.
@@ -75,12 +86,17 @@ export async function POST(req: Request) {
         system:
           "You route messages for an assistant that answers questions about a " +
           "fixed corpus of illustrated textbooks (it reads text AND figures/" +
-          "diagrams). If the textbooks could answer it (including questions about " +
+          "diagrams). " +
+          CORPUS_INFO +
+          " If the textbooks could answer it (including questions about " +
           "images, charts or diagrams), action='search' with a focused, STANDALONE " +
           "query: resolve pronouns and follow-up references ('it', 'that engine', " +
           "'show me more') using the conversation so the query works on its own. If " +
-          "it's small talk, action='chitchat' with a friendly reply. If clearly " +
-          "out of scope, action='refuse' and say so honestly.",
+          "it's small talk OR a question about the assistant itself or its corpus " +
+          "(how many books, which titles, what topics it covers, what it can do), " +
+          "action='chitchat' with a friendly reply answered accurately from the " +
+          "corpus facts above. If clearly out of scope, action='refuse' and say so " +
+          "honestly, mentioning what the corpus DOES cover.",
         prompt: history
           ? `Conversation so far:\n${history}\n\nLatest user message: ${question}`
           : question,
@@ -89,7 +105,13 @@ export async function POST(req: Request) {
       if (route.action !== "search") {
         const r = streamText({
           model: google("gemini-2.5-flash-lite"),
-          system: "Reply briefly and naturally, consistent with the conversation.",
+          system:
+            "You are a friendly assistant that answers questions about a fixed " +
+            "corpus of illustrated textbooks. " +
+            CORPUS_INFO +
+            " Reply briefly and naturally, consistent with the conversation; when " +
+            "asked about your books or abilities, answer accurately from the facts " +
+            "above and invite an on-topic question.",
           prompt: history
             ? `Conversation so far:\n${history}\n\nReply to say: ${route.reply || "Hello!"}`
             : route.reply || "Hello!",
