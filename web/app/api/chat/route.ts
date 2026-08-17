@@ -112,9 +112,10 @@ export async function POST(req: Request) {
             " Reply briefly and naturally, consistent with the conversation; when " +
             "asked about your books or abilities, answer accurately from the facts " +
             "above and invite an on-topic question.",
-          prompt: history
-            ? `Conversation so far:\n${history}\n\nReply to say: ${route.reply || "Hello!"}`
-            : route.reply || "Hello!",
+          prompt:
+            (history ? `Conversation so far:\n${history}\n\n` : "") +
+            `The user just said: ${question}\n\n` +
+            `Deliver this reply to the user, in your own natural words: ${route.reply || "Hello!"}`,
         });
         writer.merge(r.toUIMessageStream());
         return;
