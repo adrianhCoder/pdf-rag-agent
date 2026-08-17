@@ -35,8 +35,8 @@ const STARTERS = [
 export default function Home() {
   const { messages, sendMessage, status, error } = useChat();
   const [input, setInput] = useState("");
-  // Floating page preview shown while hovering a source thumbnail.
-  const [preview, setPreview] = useState<{ url: string; x: number; y: number } | null>(null);
+  // Near-fullscreen page preview shown while hovering a source thumbnail.
+  const [preview, setPreview] = useState<string | null>(null);
   const busy = status === "submitted" || status === "streaming";
   const waiting = status === "submitted"; // before the first token streams
 
@@ -162,7 +162,7 @@ export default function Home() {
                             target="_blank"
                             rel="noreferrer"
                             className="thumb"
-                            onMouseMove={(e) => setPreview({ url: s.image_url, x: e.clientX, y: e.clientY })}
+                            onMouseEnter={() => setPreview(s.image_url)}
                             onMouseLeave={() => setPreview(null)}
                           >
                             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -205,18 +205,9 @@ export default function Home() {
       </div>
 
       {preview && (
-        <div
-          className="page-preview"
-          style={{
-            left:
-              preview.x + 24 + 420 > window.innerWidth
-                ? Math.max(8, preview.x - 444)
-                : preview.x + 24,
-            top: Math.min(Math.max(preview.y, 280), window.innerHeight - 280),
-          }}
-        >
+        <div className="page-preview">
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={preview.url} alt="Enlarged page preview" />
+          <img src={preview} alt="Enlarged page preview" />
         </div>
       )}
 
