@@ -68,7 +68,6 @@ export default function Home() {
 
       <main className="chat-pane">
       <header className="chat-header">
-        <span className="eyebrow">Agentic · Multimodal Retrieval</span>
         <h1>
           Visual <span className="grad">RAG</span> Agent
         </h1>
